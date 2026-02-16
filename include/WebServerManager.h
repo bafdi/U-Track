@@ -48,7 +48,4 @@ private:
     void handleDeleteFixture(AsyncWebServerRequest *request);
     void handleAddProfile(AsyncWebServerRequest *request, uint8_t *data, size_t len);
     void handleDeleteProfile(AsyncWebServerRequest *request);
-    
-    // HTML content (stored in PROGMEM)
-    static const char* HTML_DASHBOARD;
 };

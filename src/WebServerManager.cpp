@@ -3,9 +3,6 @@
 #include "WebContent.h"
 #include <ArduinoJson.h>
 
-// Define the static member
-const char* WebServerManager::HTML_DASHBOARD = ::HTML_DASHBOARD;
-
 WebServerManager::WebServerManager(std::vector<MovingHeadProfile>& profiles, std::vector<MovingHead>& fixtures)
     : server(80), profiles(profiles), fixtures(fixtures), currentMode(MODE_UWB_TRACKING) {
     lastPosition.valid = false;
