@@ -1,0 +1,219 @@
+/*
+ * ============================================================================
+ * U-TRACK DMX CONTROLLER - CONFIGURATION REFERENCE
+ * ============================================================================
+ * 
+ * This file documents the config.json structure used by the system.
+ * The configuration is stored in LittleFS and loaded at boot.
+ * 
+ * ============================================================================
+ * DEFAULT CONFIG.JSON STRUCTURE
+ * ============================================================================
+ */
+
+{
+  "version": "1.0",
+  "system": {
+    "name": "U-Track DMX Controller"
+  },
+  
+  /* 
+   * PROFILES ARRAY
+   * Define fixture types with their DMX channel mappings and physical limits.
+   * Create profiles via Web GUI (Profiles tab) or manually.
+   */
+  "profiles": [
+    {
+      // Basic Info
+      "name": "Robin MegaPointe",              // Unique profile name
+      
+      // DMX Channel Mapping (0 = unused channel)
+      "panCoarse": 1,                          // Pan coarse control
+      "panFine": 2,                            // Pan fine (16-bit)
+      "tiltCoarse": 3,                         // Tilt coarse control
+      "tiltFine": 4,                           // Tilt fine (16-bit)
+      "dimmer": 6,                             // Intensity/Dimmer
+      "shutter": 5,                            // Shutter/Strobe
+      "colorWheel": 0,                         // Color wheel (0 = unused)
+      "goboWheel": 0,                          // Gobo wheel (0 = unused)
+      "goboRotation": 0,                       // Gobo rotation (0 = unused)
+      "focus": 34,                             // Focus control
+      "zoom": 32,                              // Zoom control
+      "control": 0,                            // Control/Reset channel
+      
+      // Physical Movement Limits (in degrees)
+      "panMin": 0.0,                           // Minimum pan angle
+      "panMax": 540.0,                         // Maximum pan angle
+      "tiltMin": 0.0,                          // Minimum tilt angle
+      "tiltMax": 265.0,                        // Maximum tilt angle
+      "tiltHome": 41.5,                        // Home/center tilt position
+      "panHomeOffset": 180.0,                  // Pan offset for 0° reference
+      
+      // Zoom/Focus Calibration (auto-calculation from distance)
+      "zoomMinAngle": 1.8,                     // Narrowest beam (degrees)
+      "zoomMaxAngle": 42.0,                    // Widest beam (degrees)
+      "zoomCalibDist1": 17.0,                  // Calibration point 1 distance (m)
+      "zoomCalibAngle1": 25.0,                 // Beam angle at distance 1
+      "focusDMX1": 51,                         // Focus DMX value at distance 1
+      "zoomCalibDist2": 6.0,                   // Calibration point 2 distance (m)
+      "zoomCalibAngle2": 35.0,                 // Beam angle at distance 2
+      "focusDMX2": 45,                         // Focus DMX value at distance 2
+      
+      // Inversion/Mounting Flags
+      "invertPan": true,                       // Reverse pan direction
+      "invertTilt": false,                     // Reverse tilt direction
+      "invertZoom": true,                      // Reverse zoom direction
+      "invertFocus": true,                     // Reverse focus direction
+      "isHanging": false,                      // true = ceiling mount, false = floor
+      
+      // Dead Zones (prevents micro-adjustments)
+      "panDeadZone": 2.0,                      // Ignore pan changes < 2°
+      "tiltDeadZone": 2.0                      // Ignore tilt changes < 2°
+    },
+    
+    // Add more profiles here...
+    {
+      "name": "Generic Moving Head",
+      "panCoarse": 1,
+      "panFine": 0,                            // 0 = no fine channel
+      "tiltCoarse": 2,
+      "tiltFine": 0,
+      "dimmer": 3,
+      "shutter": 4,
+      "colorWheel": 5,
+      "goboWheel": 6,
+      "goboRotation": 0,
+      "focus": 0,
+      "zoom": 0,
+      "control": 0,
+      "panMin": 0.0,
+      "panMax": 540.0,
+      "tiltMin": 0.0,
+      "tiltMax": 270.0,
+      "tiltHome": 135.0,
+      "panHomeOffset": 0.0,
+      "zoomMinAngle": 10.0,
+      "zoomMaxAngle": 40.0,
+      "zoomCalibDist1": 5.0,
+      "zoomCalibAngle1": 25.0,
+      "focusDMX1": 127,
+      "zoomCalibDist2": 20.0,
+      "zoomCalibAngle2": 10.0,
+      "focusDMX2": 50,
+      "invertPan": false,
+      "invertTilt": false,
+      "invertZoom": false,
+      "invertFocus": false,
+      "isHanging": true,
+      "panDeadZone": 2.0,
+      "tiltDeadZone": 2.0
+    }
+  ],
+  
+  /* 
+   * FIXTURES ARRAY
+   * Define individual lights using profiles.
+   * Add fixtures via Web GUI (Fixtures tab) or manually.
+   */
+  "fixtures": [
+    {
+      "name": "MH4 (MegaPointe)",              // Unique fixture name
+      "dmxAddress": 1,                         // DMX start address (1-512)
+      "profileName": "Robin MegaPointe",       // Must match a profile name
+      "position": {
+        "x": 7.95,                             // X position in meters
+        "y": 24.84,                            // Y position in meters
+        "z": 0.35                              // Z position (height) in meters
+      }
+    },
+    {
+      "name": "MH5 (MegaPointe)",
+      "dmxAddress": 40,                        // Uses DMX channels 40-79 (40 channels)
+      "profileName": "Robin MegaPointe",
+      "position": {
+        "x": 3.3,
+        "y": 24.23,
+        "z": 0.25
+      }
+    }
+    
+    // Add more fixtures here...
+  ]
+}
+
+/*
+ * ============================================================================
+ * CALIBRATION GUIDE
+ * ============================================================================
+ * 
+ * Position Calibration (X, Y, Z):
+ * -------------------------------
+ * 1. Measure the physical location of each fixture relative to your UWB
+ *    coordinate system origin.
+ * 2. X = horizontal distance (left/right)
+ * 3. Y = horizontal distance (front/back)
+ * 4. Z = vertical height from floor/stage
+ * 
+ * Units: Meters
+ * Precision: 0.01m (1cm) recommended
+ * 
+ * 
+ * Zoom/Focus Calibration:
+ * -----------------------
+ * For automatic beam size calculation:
+ * 
+ * 1. Place UWB tag at known distance D1 (e.g., 17m)
+ * 2. Manually adjust zoom to desired beam angle A1 (e.g., 25°)
+ * 3. Note the focus DMX value F1 (e.g., 51)
+ * 4. Set: zoomCalibDist1=D1, zoomCalibAngle1=A1, focusDMX1=F1
+ * 
+ * 5. Repeat for second distance D2 (e.g., 6m)
+ * 6. Set: zoomCalibDist2=D2, zoomCalibAngle2=A2, focusDMX2=F2
+ * 
+ * The system will interpolate zoom/focus for any distance between D1 and D2.
+ * 
+ * 
+ * Inversion Flags:
+ * ----------------
+ * If a fixture moves in the wrong direction during tracking:
+ * - Set invertPan=true to reverse pan
+ * - Set invertTilt=true to reverse tilt
+ * 
+ * 
+ * Home Offset:
+ * ------------
+ * panHomeOffset: Adjust if 0° DMX doesn't match your stage layout.
+ * Example: If 0° DMX points backward, set panHomeOffset=180.0
+ * 
+ * 
+ * Hanging vs Floor:
+ * -----------------
+ * isHanging=true:  Fixture mounted on ceiling/truss (inverts tilt calculation)
+ * isHanging=false: Fixture on floor/stage
+ * 
+ * ============================================================================
+ * COMMON PROFILES
+ * ============================================================================
+ * 
+ * Robe Robin MegaPointe (Mode 1 - 42ch):
+ *   panCoarse=1, panFine=2, tiltCoarse=3, tiltFine=4
+ *   dimmer=6, shutter=5, zoom=32, focus=34
+ *   panMax=540, tiltMax=265, tiltHome=41.5
+ * 
+ * Martin MAC 250+ (16-bit):
+ *   panCoarse=1, panFine=2, tiltCoarse=3, tiltFine=4
+ *   dimmer=5, shutter=6, colorWheel=7, goboWheel=8
+ *   panMax=540, tiltMax=270, tiltHome=135
+ * 
+ * Clay Paky Sharpy:
+ *   panCoarse=1, panFine=2, tiltCoarse=3, tiltFine=4
+ *   dimmer=6, shutter=5, zoom=32
+ *   panMax=540, tiltMax=270
+ * 
+ * Generic LED Spot (8-bit):
+ *   panCoarse=1, panFine=0, tiltCoarse=2, tiltFine=0
+ *   dimmer=3, shutter=0, zoom=0
+ *   panMax=540, tiltMax=270
+ * 
+ * ============================================================================
+ */

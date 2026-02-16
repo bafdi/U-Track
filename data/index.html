@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>U-Track DMX Controller v2.0</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="emergency-controls">
+        <button class="btn-emergency" onclick="emergencyStop()">⚠️ EMERGENCY STOP</button>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🎭 U-Track DMX Controller</h1>
+            <div class="subtitle">
+                Advanced UWB Position Tracking System v2.0
+                <span class="status-badge" id="systemStatus">System Online</span>
+            </div>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('fixtures')">💡 Fixtures</button>
+            <button class="tab-btn" onclick="switchTab('profiles')">⚙️ Profiles</button>
+            <button class="tab-btn" onclick="switchTab('control')">🎛️ Control</button>
+            <button class="tab-btn" onclick="switchTab('settings')">🔧 Settings</button>
+        </div>
+
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">📍 Live Position Data</div>
+                    <div class="position-display">
+                        <div class="position-item">
+                            <div class="position-label">X Position</div>
+                            <div class="position-value" id="posX">0.00</div>
+                            <div class="position-unit">meters</div>
+                        </div>
+                        <div class="position-item">
+                            <div class="position-label">Y Position</div>
+                            <div class="position-value" id="posY">0.00</div>
+                            <div class="position-unit">meters</div>
+                        </div>
+                        <div class="position-item">
+                            <div class="position-label">Z Position</div>
+                            <div class="position-value" id="posZ">0.00</div>
+                            <div class="position-unit">meters</div>
+                        </div>
+                        <div class="position-item">
+                            <div class="position-label">RMSE</div>
+                            <div class="position-value" id="posRMSE">0.000</div>
+                            <div class="position-unit">accuracy</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">🎮 Operating Mode</div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <div style="font-size: 2em; font-weight: bold; color: #00d4ff; margin-bottom: 20px;" id="currentMode">UWB-TRACKING</div>
+                        <div class="mode-controls">
+                            <button class="mode-btn active" onclick="setMode(0)">🎯 Tracking</button>
+                            <button class="mode-btn" onclick="setMode(1)">↔️ Pan Test</button>
+                            <button class="mode-btn" onclick="setMode(2)">↕️ Tilt Test</button>
+                            <button class="mode-btn" onclick="setMode(3)">💡 Dimmer</button>
+                            <button class="mode-btn" onclick="setMode(4)">🎨 Color</button>
+                            <button class="mode-btn" onclick="setMode(5)">🔄 Gobo</button>
+                            <button class="mode-btn" onclick="setMode(6)">✋ Manual</button>
+                            <button class="mode-btn" onclick="setMode(7)">🔁 Passthrough</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💡 Active Fixtures <span style="font-size: 0.7em; color: #888;" id="fixtureCount">(0 fixtures)</span></div>
+                <div class="fixture-list" id="dashboardFixtureList">
+                    <div style="text-align: center; padding: 40px; color: #666;">No fixtures configured. Go to the Fixtures tab to add some.</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">📈 System Info</div>
+                    <div style="line-height: 2;">
+                        <div><strong>Uptime:</strong> <span id="uptime">0s</span></div>
+                        <div><strong>Active Fixtures:</strong> <span id="activeFixtures">0</span></div>
+                        <div><strong>Available Profiles:</strong> <span id="profileCount">0</span></div>
+                        <div><strong>Position Valid:</strong> <span id="posValid">No</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FIXTURES TAB -->
+        <div id="tab-fixtures" class="tab-content">
+            <div class="card">
+                <div class="card-title">
+                    💡 Fixture Manager
+                    <button class="btn btn-primary btn-small" onclick="openAddFixtureModal()" style="margin-left: auto;">➕ Add Fixture</button>
+                </div>
+                <div class="fixture-list" id="fixtureList">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILES TAB -->
+        <div id="tab-profiles" class="tab-content">
+            <div class="card">
+                <div class="card-title">
+                    ⚙️ Fixture Profiles
+                    <button class="btn btn-primary btn-small" onclick="openAddProfileModal()" style="margin-left: auto;">➕ Add Profile</button>
+                </div>
+                <div class="profile-list" id="profileList">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROL TAB -->
+        <div id="tab-control" class="tab-content">
+            <div class="card">
+                <div class="card-title">🎛️ Manual Control</div>
+                <p style="color: #888; margin-bottom: 20px;">Switch to MANUAL mode to use these controls.</p>
+                <div class="alert alert-warning">
+                    Manual control interface coming soon. Use serial console for advanced control.
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="tab-content">
+            <div class="card">
+                <div class="card-title">🔧 System Settings</div>
+                <div class="form-group">
+                    <label class="form-label">WiFi SSID</label>
+                    <input type="text" class="form-input" value="U-Track-DMX" disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Configuration</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-primary" onclick="downloadConfig()">📥 Download Config</button>
+                        <button class="btn btn-success" onclick="document.getElementById('uploadInput').click()">📤 Upload Config</button>
+                        <input type="file" id="uploadInput" accept=".json" style="display: none;" onchange="uploadConfig(event)">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-danger" onclick="if(confirm('Reset to factory defaults?')) alert('Feature coming soon')">🔄 Factory Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals and Scripts -->
+    <script src="/app.js"></script>
+</body>
+</html>

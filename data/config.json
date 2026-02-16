@@ -1,0 +1,102 @@
+{
+  "version": "1.0",
+  "system": {
+    "name": "U-Track DMX Controller"
+  },
+  "profiles": [
+    {
+      "name": "Robin MegaPointe",
+      "panCoarse": 1,
+      "panFine": 2,
+      "tiltCoarse": 3,
+      "tiltFine": 4,
+      "dimmer": 6,
+      "shutter": 5,
+      "colorWheel": 0,
+      "goboWheel": 0,
+      "goboRotation": 0,
+      "focus": 34,
+      "zoom": 32,
+      "control": 0,
+      "panMin": 0.0,
+      "panMax": 540.0,
+      "tiltMin": 0.0,
+      "tiltMax": 265.0,
+      "tiltHome": 41.5,
+      "panHomeOffset": 180.0,
+      "zoomMinAngle": 1.8,
+      "zoomMaxAngle": 42.0,
+      "zoomCalibDist1": 17.0,
+      "zoomCalibAngle1": 25.0,
+      "focusDMX1": 51,
+      "zoomCalibDist2": 6.0,
+      "zoomCalibAngle2": 35.0,
+      "focusDMX2": 45,
+      "invertPan": true,
+      "invertTilt": false,
+      "invertZoom": true,
+      "invertFocus": true,
+      "isHanging": false,
+      "panDeadZone": 2.0,
+      "tiltDeadZone": 2.0
+    },
+    {
+      "name": "Generic Moving Head (Pan/Tilt Only)",
+      "panCoarse": 1,
+      "panFine": 0,
+      "tiltCoarse": 2,
+      "tiltFine": 0,
+      "dimmer": 3,
+      "shutter": 4,
+      "colorWheel": 5,
+      "goboWheel": 6,
+      "goboRotation": 0,
+      "focus": 0,
+      "zoom": 0,
+      "control": 0,
+      "panMin": 0.0,
+      "panMax": 540.0,
+      "tiltMin": 0.0,
+      "tiltMax": 270.0,
+      "tiltHome": 135.0,
+      "panHomeOffset": 0.0,
+      "zoomMinAngle": 10.0,
+      "zoomMaxAngle": 40.0,
+      "zoomCalibDist1": 5.0,
+      "zoomCalibAngle1": 25.0,
+      "focusDMX1": 127,
+      "zoomCalibDist2": 20.0,
+      "zoomCalibAngle2": 10.0,
+      "focusDMX2": 50,
+      "invertPan": false,
+      "invertTilt": false,
+      "invertZoom": false,
+      "invertFocus": false,
+      "isHanging": true,
+      "panDeadZone": 2.0,
+      "tiltDeadZone": 2.0
+    }
+  ],
+  "fixtures": [
+    {
+      "name": "MH4 (MegaPointe)",
+      "dmxAddress": 1,
+      "profileName": "Robin MegaPointe",
+      "position": {
+        "x": 7.95,
+        "y": 24.84,
+        "z": 0.35
+      }
+    },
+    {
+      "name": "MH5 (MegaPointe)",
+      "dmxAddress": 40,
+      "profileName": "Robin MegaPointe",
+      "position": {
+        "x": 3.3,
+        "y": 24.23,
+        "z": 0.25
+      }
+    }
+  ]
+}
