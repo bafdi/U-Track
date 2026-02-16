@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "author": "Dein Name",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": { "env": "esp32dev" }
+    },
+    {
+      "type": "wokwi-logic-analyzer",
+      "id": "logic1",
+      "top": -80,
+      "left": 180,
+      "attrs": { "bufferSize": "1000000" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:17", "logic1:D0", "green", [ "v0" ] ],
+    [ "esp:16", "logic1:D1", "blue", [ "v0" ] ],
+    [ "esp:17", "esp:16", "orange", [ "v-20", "h-40" ] ]
+  ]
+}
