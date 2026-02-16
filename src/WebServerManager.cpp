@@ -75,6 +75,22 @@ void WebServerManager::setupRoutes() {
         handleGetFixtures(request);
     });
     
+    // API: Set DMX channel value (for manual control)
+    server.on("/api/dmx/set", HTTP_GET, [this](AsyncWebServerRequest *request){
+        handleSetDMXChannel(request);
+    });
+    
+    // API: WiFi configuration
+    server.on("/api/wifi/config", HTTP_POST, 
+        [](AsyncWebServerRequest *request){
+            request->send(200, "text/plain", "OK");
+        },
+        NULL,
+        [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
+            handleWiFiConfig(request, data, len);
+        }
+    );
+    
     // 404 handler
     server.onNotFound([](AsyncWebServerRequest *request){
         request->send(404, "text/plain", "Not Found");
@@ -207,4 +223,53 @@ void WebServerManager::handleAddProfile(AsyncWebServerRequest *request, uint8_t 
 
 void WebServerManager::handleDeleteProfile(AsyncWebServerRequest *request) {
     // Implemented in handleSaveConfig (full config save)
+}
+
+void WebServerManager::handleSetDMXChannel(AsyncWebServerRequest *request) {
+    if (!request->hasParam("ch") || !request->hasParam("val")) {
+        request->send(400, "text/plain", "Missing parameters");
+        return;
+    }
+    
+    int channel = request->getParam("ch")->value().toInt();
+    int value = request->getParam("val")->value().toInt();
+    
+    // Validate parameters
+    if (channel < 1 || channel > 512 || value < 0 || value > 255) {
+        request->send(400, "text/plain", "Invalid channel or value");
+        return;
+    }
+    
+    // Call the callback to set DMX channel in main.cpp
+    if (onDMXChannelSet) {
+        onDMXChannelSet(channel, value);
+    }
+    
+    request->send(200, "text/plain", "OK");
+}
+
+void WebServerManager::handleWiFiConfig(AsyncWebServerRequest *request, uint8_t *data, size_t len) {
+    // Parse JSON
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, data, len);
+    
+    if (error) {
+        request->send(400, "text/plain", "Invalid JSON");
+        return;
+    }
+    
+    const char* ssid = doc["ssid"];
+    const char* password = doc["password"];
+    
+    if (!ssid || strlen(ssid) == 0) {
+        request->send(400, "text/plain", "SSID required");
+        return;
+    }
+    
+    // Call callback to save WiFi config
+    if (onWiFiConfig) {
+        onWiFiConfig(ssid, password ? password : "");
+    }
+    
+    request->send(200, "text/plain", "WiFi config saved");
 }

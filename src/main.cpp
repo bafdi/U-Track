@@ -5,6 +5,7 @@
 #include <cmath>
 #include <WiFi.h>
 #include <esp_dmx.h>
+#include <Preferences.h>
 
 #include "Types.h"
 #include "MovingHead.h"
@@ -110,6 +111,36 @@ void initializeWebServer() {
     Serial.print(IP);
     Serial.println("/\n");
     
+    // Try to connect to external WiFi if configured
+    Preferences prefs;
+    prefs.begin("utrack", true); // read-only
+    String savedSSID = prefs.getString("wifi_ssid", "");
+    String savedPass = prefs.getString("wifi_pass", "");
+    prefs.end();
+    
+    if (savedSSID.length() > 0) {
+        Serial.printf("📡 Connecting to external WiFi: %s\n", savedSSID.c_str());
+        WiFi.begin(savedSSID.c_str(), savedPass.c_str());
+        
+        int attempts = 0;
+        while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+            delay(500);
+            Serial.print(".");
+            attempts++;
+        }
+        
+        if (WiFi.status() == WL_CONNECTED) {
+            Serial.println("\n✓ Connected to external WiFi!");
+            Serial.print("IP Address: ");
+            Serial.println(WiFi.localIP());
+            Serial.print("Dashboard also available at: http://");
+            Serial.println(WiFi.localIP());
+        } else {
+            Serial.println("\n⚠️ Could not connect to external WiFi");
+            Serial.println("Access Point mode still active");
+        }
+    }
+    
     webServer = new WebServerManager(fixtureProfiles, movingHeads);
     
     // Set callbacks
@@ -127,6 +158,27 @@ void initializeWebServer() {
         memset(dmxUniverse, 0, sizeof(dmxUniverse));
         sendDMXData();
         changeMode(MODE_MANUAL);
+    };
+    
+    // DMX manual control callback
+    webServer->onDMXChannelSet = [](int channel, int value) {
+        if (channel >= 1 && channel <= 512 && value >= 0 && value <= 255) {
+            dmxUniverse[channel] = (uint8_t)value;
+            Serial.printf("🎛️ Manual DMX: Ch%d = %d\n", channel, value);
+        }
+    };
+    
+    // WiFi configuration callback
+    webServer->onWiFiConfig = [](const char* ssid, const char* password) {
+        Serial.printf("📡 WiFi Config: SSID='%s'\n", ssid);
+        // Save to preferences
+        Preferences prefs;
+        prefs.begin("utrack", false);
+        prefs.putString("wifi_ssid", ssid);
+        prefs.putString("wifi_pass", password);
+        prefs.end();
+        Serial.println("✓ WiFi settings saved to flash");
+        Serial.println("💡 Restart device to connect to external WiFi");
     };
     
     webServer->begin();

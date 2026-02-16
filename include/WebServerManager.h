@@ -22,6 +22,8 @@ public:
     void (*onConfigChanged)() = nullptr;
     void (*onModeChange)(OperatingMode newMode) = nullptr;
     void (*onEmergencyStop)() = nullptr;
+    void (*onDMXChannelSet)(int channel, int value) = nullptr;
+    void (*onWiFiConfig)(const char* ssid, const char* password) = nullptr;
     
     // Update live data
     void updatePositionData(const PositionData& pos);
@@ -48,4 +50,6 @@ private:
     void handleDeleteFixture(AsyncWebServerRequest *request);
     void handleAddProfile(AsyncWebServerRequest *request, uint8_t *data, size_t len);
     void handleDeleteProfile(AsyncWebServerRequest *request);
+    void handleSetDMXChannel(AsyncWebServerRequest *request);
+    void handleWiFiConfig(AsyncWebServerRequest *request, uint8_t *data, size_t len);
 };
