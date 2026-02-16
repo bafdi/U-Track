@@ -88,7 +88,7 @@ void initializeDMX() {
 }
 
 void initializeESPNOW() {
-    WiFi.mode(WIFI_STA);
+    WiFi.mode(WIFI_AP_STA);
     if (esp_now_init() != ESP_OK) {
         Serial.println("Fehler bei ESP-NOW Initialisierung!");
         return;
@@ -462,8 +462,8 @@ void setup() {
     delay(1000);
     
     Serial.println("\n╔════════════════════════════════════════╗");
-    Serial.println("║   U-TRACK DMX TRACKING SYSTEM v2.0    ║");
-    Serial.println("║   With Dynamic Web Configuration      ║");
+    Serial.println("║   U-TRACK DMX TRACKING SYSTEM v2.0     ║");
+    Serial.println("║   With Dynamic Web Configuration       ║");
     Serial.println("╚════════════════════════════════════════╝\n");
     
     // Initialize LittleFS for config storage
@@ -477,12 +477,12 @@ void setup() {
     
     // Initialize hardware
     initializeDMX();
-    
-    // Initialize WiFi and Web Server
-    initializeWebServer();
-    
+
     // Initialize ESP-NOW for UWB position data
     initializeESPNOW();
+
+    // Initialize WiFi and Web Server
+    initializeWebServer();
     
     pinMode(2, OUTPUT);
     changeMode(MODE_UWB_TRACKING);
