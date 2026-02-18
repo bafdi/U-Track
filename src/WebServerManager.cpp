@@ -80,6 +80,11 @@ void WebServerManager::setupRoutes() {
         handleSetDMXChannel(request);
     });
     
+    // API: Get DMX channel values (for monitor)
+    server.on("/api/dmx/status", HTTP_GET, [this](AsyncWebServerRequest *request){
+        handleGetDMXStatus(request);
+    });
+    
     // API: WiFi configuration
     server.on("/api/wifi/config", HTTP_POST, 
         [](AsyncWebServerRequest *request){
@@ -246,6 +251,36 @@ void WebServerManager::handleSetDMXChannel(AsyncWebServerRequest *request) {
     }
     
     request->send(200, "text/plain", "OK");
+}
+
+void WebServerManager::handleGetDMXStatus(AsyncWebServerRequest *request) {
+    // Build JSON response with all 512 DMX channel values
+    JsonDocument doc;
+    JsonArray channels = doc["channels"].to<JsonArray>();
+    
+    // Get DMX universe data from callback
+    if (onGetDMXUniverse) {
+        const uint8_t* dmxData = onGetDMXUniverse();
+        if (dmxData) {
+            for (int i = 0; i < 512; i++) {
+                channels.add(dmxData[i]);
+            }
+        } else {
+            // Return zeros if no data available
+            for (int i = 0; i < 512; i++) {
+                channels.add(0);
+            }
+        }
+    } else {
+        // Return zeros if callback not set
+        for (int i = 0; i < 512; i++) {
+            channels.add(0);
+        }
+    }
+    
+    String response;
+    serializeJson(doc, response);
+    request->send(200, "application/json", response);
 }
 
 void WebServerManager::handleWiFiConfig(AsyncWebServerRequest *request, uint8_t *data, size_t len) {

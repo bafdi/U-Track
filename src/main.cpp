@@ -181,6 +181,11 @@ void initializeWebServer() {
         Serial.println("💡 Restart device to connect to external WiFi");
     };
     
+    // DMX universe getter callback (for monitor)
+    webServer->onGetDMXUniverse = []() -> const uint8_t* {
+        return dmxUniverse;
+    };
+    
     webServer->begin();
 }
 
